@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using MicroRabbit.Domain.Core.Commands;
+﻿using MicroRabbit.Domain.Core.Commands;
 using MicroRabbit.Domain.Core.Events;
 
 namespace MicroRabbit.Domain.Core.Bus
@@ -12,7 +7,7 @@ namespace MicroRabbit.Domain.Core.Bus
     {
         Task SendCommand<T>(T command) where T : Command;
         Task Publish<T>(T @event) where T : Event;
-        void Subscribe<T, TH>()
+        void SubscribeAsync<T, TH>()
             where T : Event
             where TH : IEventHandler<T>;
     }

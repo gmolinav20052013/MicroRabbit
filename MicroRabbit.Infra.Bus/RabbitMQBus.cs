@@ -47,7 +47,7 @@ namespace MicroRabbit.Infra.Bus
 
         }
         
-        public void Subscribe<T, TH>()
+        public void SubscribeAsync<T, TH>()
             where T : Event
             where TH : IEventHandler<T>
         {
@@ -70,14 +70,16 @@ namespace MicroRabbit.Infra.Bus
 
             _handlers[eventName].Add(handlerType);
 
-            await StartBasicConsume<T>();
+             Task.Run(async () =>
+             {
+                 await StartBasicConsume<T>();
+             });
         }
 
         private async Task StartBasicConsume<T>() where T : Event
         {
-           
-            
-            var factory = new ConnectionFactory() { HostName = "localhost", DispatchConsumersAsync = true };
+            var factory = new ConnectionFactory() { HostName = "localhost" };
+
             var connection = await factory.CreateConnectionAsync();
             var channel = await connection.CreateChannelAsync();
             var eventName = typeof(T).Name;
@@ -87,8 +89,6 @@ namespace MicroRabbit.Infra.Bus
             consumer.ReceivedAsync += Consumer_Received;
 
             await channel.BasicConsumeAsync(eventName, true, consumer);
-
-
         }
 
         private async Task Consumer_Received(object sender, BasicDeliverEventArgs @event)
